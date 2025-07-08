@@ -191,22 +191,22 @@ public class CustomQuizActivity extends AppCompatActivity {
     
     private void showAnswerFeedback(boolean isCorrect, String correctAnswer) {
         // Set colors for all options
-        setOptionColor(text1.getText().toString(), correctAnswer, selectedAnswer, cardBg);
-        setOptionColor(text2.getText().toString(), correctAnswer, selectedAnswer, cardBg2);
-        setOptionColor(text3.getText().toString(), correctAnswer, selectedAnswer, cardBg3);
-        setOptionColor(text4.getText().toString(), correctAnswer, selectedAnswer, cardBg4);
+        setOptionBackground(text1.getText().toString(), correctAnswer, selectedAnswer, radioButton1);
+        setOptionBackground(text2.getText().toString(), correctAnswer, selectedAnswer, radioButton2);
+        setOptionBackground(text3.getText().toString(), correctAnswer, selectedAnswer, radioButton3);
+        setOptionBackground(text4.getText().toString(), correctAnswer, selectedAnswer, radioButton4);
     }
     
-    private void setOptionColor(String optionText, String correctAnswer, String selectedAnswer, ImageView imageView) {
+    private void setOptionBackground(String optionText, String correctAnswer, String selectedAnswer, CardView cardView) {
         if (optionText.equals(correctAnswer)) {
-            // Correct answer - green
-            imageView.setImageResource(R.drawable.correct_answer);
+            // Correct answer - green background
+            cardView.setBackgroundResource(R.drawable.correct_answer_bg);
         } else if (optionText.equals(selectedAnswer)) {
-            // Selected wrong answer - red
-            imageView.setImageResource(R.drawable.incorrect_answer);
+            // Selected wrong answer - red background
+            cardView.setBackgroundResource(R.drawable.incorrect_answer_bg);
         } else {
-            // Other options - default
-            imageView.setImageResource(R.drawable.set_un_checked_to_variant);
+            // Other options - default background
+            cardView.setBackgroundResource(R.drawable.default_answer_bg);
         }
     }
     

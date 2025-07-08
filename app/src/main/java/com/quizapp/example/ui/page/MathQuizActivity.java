@@ -234,36 +234,22 @@ public class MathQuizActivity extends AppCompatActivity {
         }
         
         // Set colors based on answers
-        setOptionColor(text1.getText().toString(), correctAnswer, txt);
-        setOptionColor(text2.getText().toString(), correctAnswer, txt);
-        setOptionColor(text3.getText().toString(), correctAnswer, txt);
-        setOptionColor(text4.getText().toString(), correctAnswer, txt);
+        setOptionBackground(text1.getText().toString(), correctAnswer, txt, radioButton1);
+        setOptionBackground(text2.getText().toString(), correctAnswer, txt, radioButton2);
+        setOptionBackground(text3.getText().toString(), correctAnswer, txt, radioButton3);
+        setOptionBackground(text4.getText().toString(), correctAnswer, txt, radioButton4);
     }
     
-    private void setOptionColor(String optionText, String correctAnswer, String selectedAnswer) {
-        ImageView targetImage = null;
-        
-        if (optionText.equals(text1.getText().toString())) {
-            targetImage = cardBg;
-        } else if (optionText.equals(text2.getText().toString())) {
-            targetImage = cardBg2;
-        } else if (optionText.equals(text3.getText().toString())) {
-            targetImage = cardBg3;
-        } else if (optionText.equals(text4.getText().toString())) {
-            targetImage = cardBg4;
-        }
-        
-        if (targetImage != null) {
-            if (optionText.equals(correctAnswer)) {
-                // Correct answer - green
-                targetImage.setImageResource(R.drawable.correct_answer);
-            } else if (optionText.equals(selectedAnswer)) {
-                // Selected wrong answer - red
-                targetImage.setImageResource(R.drawable.incorrect_answer);
-            } else {
-                // Other options - default
-                targetImage.setImageResource(R.drawable.set_un_checked_to_variant);
-            }
+    private void setOptionBackground(String optionText, String correctAnswer, String selectedAnswer, CardView cardView) {
+        if (optionText.equals(correctAnswer)) {
+            // Correct answer - green background
+            cardView.setBackgroundResource(R.drawable.correct_answer_bg);
+        } else if (optionText.equals(selectedAnswer)) {
+            // Selected wrong answer - red background
+            cardView.setBackgroundResource(R.drawable.incorrect_answer_bg);
+        } else {
+            // Other options - default background
+            cardView.setBackgroundResource(R.drawable.default_answer_bg);
         }
     }
     
