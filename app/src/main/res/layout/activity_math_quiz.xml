@@ -91,6 +91,17 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         tools:text="42*32=?" />
 
+    <TextView
+        android:id="@+id/tvScoreMath"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Score: 0"
+        android:textColor="@color/blue_med"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/textView78"
+        app:layout_constraintTop_toBottomOf="@+id/textView78" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNextQuestionLiteratureAndGeography"
         style="@style/btnStyle"
@@ -110,14 +121,14 @@
         android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="16dp"
         android:checkedButton="@id/radioButton1"
         app:layout_constraintVertical_bias=".25"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/textView78"
         app:layout_constraintStart_toStartOf="@+id/textView78"
-        app:layout_constraintTop_toBottomOf="@+id/textView78">
+        app:layout_constraintTop_toBottomOf="@+id/tvScoreMath">
 
         <LinearLayout
             android:layout_width="match_parent"

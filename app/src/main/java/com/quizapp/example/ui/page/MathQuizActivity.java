@@ -31,13 +31,14 @@ import java.util.Map;
 
 public class MathQuizActivity extends AppCompatActivity {
     private int currentQuestionIndex = 0;
-    private TextView tvQuestion, tvQuestionNumber, text1, text2, text3, text4;
+    private TextView tvQuestion, tvQuestionNumber, text1, text2, text3, text4, tvScore;
     private Button btnNext;
     private CardView radioButton1, radioButton2, radioButton3, radioButton4;
     private List<String> questions;
     int progressTime;
     private ProgressBar progressBar;
     private int correctQuestion = 0;
+    private int currentScore = 0;
     String txt;
     private ImageView cardBg, backadabiy, cardBg2, cardBg3, cardBg4;
     private Map<String, Map<String, Boolean>> questionsAnswerMap;
@@ -46,6 +47,7 @@ public class MathQuizActivity extends AppCompatActivity {
     static boolean isActive;
     CountDownTimer mCountDownTimer;
     private Chronometer chronometer;
+    private boolean answerSelected = false;
 
     String subject;
 
@@ -142,6 +144,7 @@ public class MathQuizActivity extends AppCompatActivity {
         String subject = intent.getStringExtra(Constants.SUBJECT);
 
         radioButton1.setOnClickListener(v -> {
+                    if (answerSelected) return;
                     click(v);
                     radioButton2.setEnabled(false);
                     radioButton3.setEnabled(false);
@@ -151,7 +154,7 @@ public class MathQuizActivity extends AppCompatActivity {
                     cardBg3.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg4.setImageResource(R.drawable.set_un_checked_to_variant);
                     txt = text1.getText().toString();
-                    new Handler().postDelayed(this::clickButton, 500);
+                    new Handler().postDelayed(this::clickButton, 1000);
 
                 }
         );
@@ -160,6 +163,7 @@ public class MathQuizActivity extends AppCompatActivity {
     private void variantClick2() {
 
         radioButton2.setOnClickListener(v -> {
+                    if (answerSelected) return;
                     click(v);
                     radioButton1.setEnabled(false);
                     radioButton3.setEnabled(false);
@@ -170,7 +174,7 @@ public class MathQuizActivity extends AppCompatActivity {
                     cardBg3.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg4.setImageResource(R.drawable.set_un_checked_to_variant);
                     txt = text2.getText().toString();
-                    new Handler().postDelayed(this::clickButton, 500);
+                    new Handler().postDelayed(this::clickButton, 1000);
 
                 }
         );
@@ -180,6 +184,7 @@ public class MathQuizActivity extends AppCompatActivity {
     private void variantClick3() {
 
         radioButton3.setOnClickListener(v -> {
+                    if (answerSelected) return;
                     click(v);
                     radioButton2.setEnabled(false);
                     radioButton4.setEnabled(false);
@@ -190,7 +195,7 @@ public class MathQuizActivity extends AppCompatActivity {
                     cardBg.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg4.setImageResource(R.drawable.set_un_checked_to_variant);
                     txt = text3.getText().toString();
-                    new Handler().postDelayed(this::clickButton, 500);
+                    new Handler().postDelayed(this::clickButton, 1000);
 
                 }
         );
@@ -198,6 +203,7 @@ public class MathQuizActivity extends AppCompatActivity {
 
     private void variantClick4() {
         radioButton4.setOnClickListener(v -> {
+                    if (answerSelected) return;
                     click(v);
             radioButton2.setEnabled(false);
             radioButton3.setEnabled(false);
@@ -209,14 +215,66 @@ public class MathQuizActivity extends AppCompatActivity {
                     cardBg.setImageResource(R.drawable.set_un_checked_to_variant);
                     txt = text4.getText().toString();
 
-                    new Handler().postDelayed(this::clickButton, 500);
+                    new Handler().postDelayed(this::clickButton, 1000);
 
                 }
         );
     }
 
+    private void showAnswerFeedback(boolean isCorrect) {
+        answerSelected = true;
+        
+        // Get correct answer
+        String correctAnswer = "";
+        for (Map.Entry<String, Boolean> entry : questionsAnswerMap.get(questions.get(currentQuestionIndex)).entrySet()) {
+            if (entry.getValue()) {
+                correctAnswer = entry.getKey();
+                break;
+            }
+        }
+        
+        // Set colors based on answers
+        setOptionColor(text1.getText().toString(), correctAnswer, txt);
+        setOptionColor(text2.getText().toString(), correctAnswer, txt);
+        setOptionColor(text3.getText().toString(), correctAnswer, txt);
+        setOptionColor(text4.getText().toString(), correctAnswer, txt);
+    }
+    
+    private void setOptionColor(String optionText, String correctAnswer, String selectedAnswer) {
+        ImageView targetImage = null;
+        
+        if (optionText.equals(text1.getText().toString())) {
+            targetImage = cardBg;
+        } else if (optionText.equals(text2.getText().toString())) {
+            targetImage = cardBg2;
+        } else if (optionText.equals(text3.getText().toString())) {
+            targetImage = cardBg3;
+        } else if (optionText.equals(text4.getText().toString())) {
+            targetImage = cardBg4;
+        }
+        
+        if (targetImage != null) {
+            if (optionText.equals(correctAnswer)) {
+                // Correct answer - green
+                targetImage.setImageResource(R.drawable.correct_answer);
+            } else if (optionText.equals(selectedAnswer)) {
+                // Selected wrong answer - red
+                targetImage.setImageResource(R.drawable.incorrect_answer);
+            } else {
+                // Other options - default
+                targetImage.setImageResource(R.drawable.set_un_checked_to_variant);
+            }
+        }
+    }
+    
+    private void updateScoreDisplay() {
+        if (tvScore != null) {
+            tvScore.setText("Score: " + currentScore);
+        }
+    }
     private void variantClear() {
         txt = "";
+        answerSelected = false;
         radioButton1.setEnabled(true);
         radioButton2.setEnabled(true);
         radioButton3.setEnabled(true);
@@ -262,12 +320,24 @@ public class MathQuizActivity extends AppCompatActivity {
         if (!txt.isEmpty()) {
 
             boolean answer = Boolean.TRUE.equals(questionsAnswerMap.get(questions.get(currentQuestionIndex)).get(txt));
+            
+            // Show answer feedback
+            showAnswerFeedback(answer);
+            
             if (answer) {
                 correctQuestion++;
+                currentScore += 5;
 
                 mCountDownTimer.cancel();
                 createCountDownTimer(time += 3000);//                        994051755
+            } else {
+                currentScore -= 2;
+                if (currentScore < 0) currentScore = 0;
             }
+            
+            // Update score display
+            updateScoreDisplay();
+            
             currentQuestionIndex++;
             variantClear();
             if (btnNext.getText().equals(getString(R.string.next))) {
@@ -302,6 +372,7 @@ public class MathQuizActivity extends AppCompatActivity {
 
         tvQuestion = findViewById(R.id.textView78);
         tvQuestionNumber = findViewById(R.id.textView18);
+        tvScore = findViewById(R.id.tvScoreMath);
         btnNext = findViewById(R.id.btnNextQuestionLiteratureAndGeography);
         text1 = findViewById(R.id.radioButton1Text);
         text2 = findViewById(R.id.radioButto21Text);
@@ -317,6 +388,9 @@ public class MathQuizActivity extends AppCompatActivity {
         radioButton2 = findViewById(R.id.radioButton2);
         radioButton3 = findViewById(R.id.radioButton3);
         radioButton4 = findViewById(R.id.radioButton4);
+        
+        // Initialize score display
+        updateScoreDisplay();
     }
 
 

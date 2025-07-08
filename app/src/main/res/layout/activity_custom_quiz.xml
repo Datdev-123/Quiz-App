@@ -98,16 +98,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Đây là câu hỏi mẫu?" />
+        <TextView
+            android:id="@+id/tvScoreCustom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Score: 0"
+            android:textColor="@color/blue_med"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/tvCustomQuestion"
+            app:layout_constraintStart_toStartOf="@+id/tvCustomQuestion"
+            app:layout_constraintTop_toBottomOf="@+id/tvCustomQuestion" />
 
         <LinearLayout
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="@+id/tvCustomQuestion"
-            app:layout_constraintStart_toStartOf="@+id/tvCustomQuestion"
-            app:layout_constraintTop_toBottomOf="@+id/tvCustomQuestion">
+            app:layout_constraintEnd_toEndOf="@+id/tvScoreCustom"
+            app:layout_constraintStart_toStartOf="@+id/tvScoreCustom"
+            app:layout_constraintTop_toBottomOf="@+id/tvScoreCustom">
 
             <LinearLayout
                 android:layout_width="match_parent"

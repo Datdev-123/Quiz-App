@@ -28,16 +28,18 @@ import java.util.Map;
 
 public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
     private int currentQuestionIndex = 0;
-    private TextView tvQuestion, tvQuestionNumber, text1, text2, text3, text4;
+    private TextView tvQuestion, tvQuestionNumber, text1, text2, text3, text4, tvScore;
     private Button btnNext;
     private CardView radioButton1, radioButton2, radioButton3, radioButton4;
     private List<String> questions;
     private ProgressBar progressBar;
     private int correctQuestion = 0;
+    private int currentScore = 0;
     String txt;
     private ImageView cardBg, backLiterature, cardBg2, cardBg3, cardBg4;
     private Map<String, Map<String, Boolean>> questionsAnswerMap;
     private ArrayList<String> getQuestionsAnswerMap;
+    private boolean answerSelected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +69,48 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (!txt.isEmpty()) {
+                if (!txt.isEmpty() && !answerSelected) {
+                    // Disable all options after selection
+                    disableAllOptions();
+                    answerSelected = true;
 
                     boolean answer = questionsAnswerMap.get(questions.get(currentQuestionIndex)).get(txt);
+                    
+                    // Show correct/incorrect colors
+                    showAnswerFeedback(answer);
+                    
+                    // Update score
                     if (answer) {
                         correctQuestion++;
+                        currentScore += 5; // +5 for correct answer
+                    } else {
+                        currentScore -= 2; // -2 for incorrect answer
+                        if (currentScore < 0) currentScore = 0; // Don't go below 0
                     }
+                    
+                    // Update score display
+                    updateScoreDisplay();
+                    
+                    // Change button text to "Next" and enable it
+                    btnNext.setText("Next");
+                    btnNext.setEnabled(true);
+                    
+                } else if (answerSelected && btnNext.getText().equals("Next")) {
+                    // Move to next question
                     currentQuestionIndex++;
+                    answerSelected = false;
                     variantClear();
-                    if (btnNext.getText().equals(getString(R.string.next))) {
+                    enableAllOptions();
+                    
+                    if (currentQuestionIndex < Constants.QUESTION_SHOWING) {
                         displayNextQuestions();
+                        btnNext.setText(getString(R.string.next));
+                        btnNext.setEnabled(false);
                     } else {
                         Intent intentResult = new Intent(GeographyOrLiteratureQuizActivity.this, FinalResultActivity.class);
                         intentResult.putExtra(Constants.SUBJECT, subject);
                         intentResult.putExtra(Constants.CORRECT, correctQuestion);
-                        intentResult.putExtra(Constants.TYPE, "math");
+                        intentResult.putExtra(Constants.TYPE, "literature");
                         intentResult.putExtra(Constants.INCORRECT, Constants.QUESTION_SHOWING - correctQuestion);
                         intentResult.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intentResult);
@@ -101,6 +130,7 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
 
     private void variantClick1() {
         radioButton1.setOnClickListener(v -> {
+                if (answerSelected) return;
                     cardBg.setImageResource(R.drawable.set_checked_to_variant);
                     cardBg2.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg3.setImageResource(R.drawable.set_un_checked_to_variant);
@@ -112,6 +142,7 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
 
     private void variantClick2() {
         radioButton2.setOnClickListener(v -> {
+                if (answerSelected) return;
                     cardBg2.setImageResource(R.drawable.set_checked_to_variant);
                     cardBg.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg3.setImageResource(R.drawable.set_un_checked_to_variant);
@@ -124,6 +155,7 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
 
     private void variantClick3() {
         radioButton3.setOnClickListener(v -> {
+                if (answerSelected) return;
                     cardBg3.setImageResource(R.drawable.set_checked_to_variant);
                     cardBg2.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg.setImageResource(R.drawable.set_un_checked_to_variant);
@@ -136,6 +168,7 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
 
     private void variantClick4() {
         radioButton4.setOnClickListener(v -> {
+                if (answerSelected) return;
                     cardBg4.setImageResource(R.drawable.set_checked_to_variant);
                     cardBg2.setImageResource(R.drawable.set_un_checked_to_variant);
                     cardBg3.setImageResource(R.drawable.set_un_checked_to_variant);
@@ -146,6 +179,69 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
         );
     }
 
+    private void showAnswerFeedback(boolean isCorrect) {
+        // Get correct answer
+        String correctAnswer = "";
+        for (Map.Entry<String, Boolean> entry : questionsAnswerMap.get(questions.get(currentQuestionIndex)).entrySet()) {
+            if (entry.getValue()) {
+                correctAnswer = entry.getKey();
+                break;
+            }
+        }
+        
+        // Set colors based on answers
+        setOptionColor(text1.getText().toString(), correctAnswer, txt);
+        setOptionColor(text2.getText().toString(), correctAnswer, txt);
+        setOptionColor(text3.getText().toString(), correctAnswer, txt);
+        setOptionColor(text4.getText().toString(), correctAnswer, txt);
+    }
+    
+    private void setOptionColor(String optionText, String correctAnswer, String selectedAnswer) {
+        ImageView targetImage = null;
+        
+        if (optionText.equals(text1.getText().toString())) {
+            targetImage = cardBg;
+        } else if (optionText.equals(text2.getText().toString())) {
+            targetImage = cardBg2;
+        } else if (optionText.equals(text3.getText().toString())) {
+            targetImage = cardBg3;
+        } else if (optionText.equals(text4.getText().toString())) {
+            targetImage = cardBg4;
+        }
+        
+        if (targetImage != null) {
+            if (optionText.equals(correctAnswer)) {
+                // Correct answer - green
+                targetImage.setImageResource(R.drawable.correct_answer);
+            } else if (optionText.equals(selectedAnswer)) {
+                // Selected wrong answer - red
+                targetImage.setImageResource(R.drawable.incorrect_answer);
+            } else {
+                // Other options - default
+                targetImage.setImageResource(R.drawable.set_un_checked_to_variant);
+            }
+        }
+    }
+    
+    private void disableAllOptions() {
+        radioButton1.setEnabled(false);
+        radioButton2.setEnabled(false);
+        radioButton3.setEnabled(false);
+        radioButton4.setEnabled(false);
+    }
+    
+    private void enableAllOptions() {
+        radioButton1.setEnabled(true);
+        radioButton2.setEnabled(true);
+        radioButton3.setEnabled(true);
+        radioButton4.setEnabled(true);
+    }
+    
+    private void updateScoreDisplay() {
+        if (tvScore != null) {
+            tvScore.setText("Score: " + currentScore);
+        }
+    }
     private void variantClear() {
         txt = "";
         cardBg.setImageResource(R.drawable.set_un_checked_to_variant);
@@ -194,6 +290,7 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
 
         tvQuestion = findViewById(R.id.textView78);
         tvQuestionNumber = findViewById(R.id.textView18);
+        tvScore = findViewById(R.id.tvScore);
         btnNext = findViewById(R.id.btnNextQuestionLiteratureAndGeography);
         text1 = findViewById(R.id.radioButton1Text);
         text2 = findViewById(R.id.radioButto21Text);
@@ -209,5 +306,9 @@ public class GeographyOrLiteratureQuizActivity extends AppCompatActivity {
         radioButton2 = findViewById(R.id.radioButton2);
         radioButton3 = findViewById(R.id.radioButton3);
         radioButton4 = findViewById(R.id.radioButton4);
+        
+        // Initialize score display
+        updateScoreDisplay();
+        btnNext.setEnabled(false);
     }
 }
